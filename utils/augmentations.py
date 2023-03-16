@@ -155,7 +155,19 @@ class Resize(object):
         if self.resize_gt:
             # Act like each object is a color channel
             masks = masks.transpose((1, 2, 0))
-            masks = cv2.resize(masks, (width, height))
+            """
+            ISSUE 652
+            Number of objects in an image is more than ~500. CV resize method cannot process that many channels.
+            Issue https://github.com/dbolya/yolact/issues/652#issuecomment-1109687428
+            """
+            cv_limit = 512
+            if masks.shape[2] <= cv_limit:
+                masks = cv2.resize(masks, (width, height))
+            else:
+                # split masks array on batches with max size 512 along channel axis, resize and merge them back
+                masks = np.concatenate([cv2.resize(masks[:, :, i:min(i + cv_limit, masks.shape[2])], (width, height))
+                                        for i in range(0, masks.shape[2], cv_limit)], axis=2)
+
             
             # OpenCV resizes a (w,h,1) array to (s,s), so fix that
             if len(masks.shape) == 2:
@@ -303,6 +315,7 @@ class RandomSampleCrop(object):
         )
 
     def __call__(self, image, masks, boxes=None, labels=None):
+        np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
         height, width, _ = image.shape
         while True:
             # randomly choose a mode

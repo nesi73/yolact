@@ -80,7 +80,15 @@ parser.add_argument('--no_autoscale', dest='autoscale', action='store_false',
                     help='YOLACT will automatically scale the lr and the number of iterations depending on the batch size. Set this if you want to disable that.')
 
 parser.set_defaults(keep_latest=False, log=True, log_gpu=False, interrupt=True, autoscale=True)
-args = parser.parse_args()
+
+# DEBUG
+args = ["--config", "yolact_base_config", "--batch_size","2", "--dataset","copilot_dataset", "--num_workers","4"]
+# args = ''
+if args == '':
+    args = parser.parse_args()
+else:
+    args = parser.parse_args(args)
+
 
 if args.config is not None:
     set_cfg(args.config)
@@ -246,9 +254,14 @@ def train():
     # Which learning rate adjustment step are we on? lr' = lr * gamma ^ step_index
     step_index = 0
 
+    """
+    ISSUE 664
+    Change shuffle True to False to solve --> RuntimeError: Expected a 'cuda' device type for generator but found 'cpu'.
+    See issue: https://github.com/dbolya/yolact/issues/664#issuecomment-878241658
+    """
     data_loader = data.DataLoader(dataset, args.batch_size,
                                   num_workers=args.num_workers,
-                                  shuffle=True, collate_fn=detection_collate,
+                                  shuffle=False, collate_fn=detection_collate,
                                   pin_memory=True)
     
     

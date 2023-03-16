@@ -54,7 +54,9 @@ COCO_LABEL_MAP = { 1:  1,  2:  2,  3:  3,  4:  4,  5:  5,  6:  6,  7:  7,  8:  8
                   74: 65, 75: 66, 76: 67, 77: 68, 78: 69, 79: 70, 80: 71, 81: 72,
                   82: 73, 84: 74, 85: 75, 86: 76, 87: 77, 88: 78, 89: 79, 90: 80}
 
+COPILOT_CLASSES = ('panel', 'cropped_panel')
 
+COPILOT_LABEL_MAP = {1: 1, 2: 2}
 
 # ----------------------- CONFIG CLASS ----------------------- #
 
@@ -126,6 +128,20 @@ dataset_base = Config({
     # provide a map from category_id -> index in class_names + 1 (the +1 is there because it's 1-indexed).
     # If not specified, this just assumes category ids start at 1 and increase sequentially.
     'label_map': None
+})
+
+copilot_dataset = dataset_base.copy({
+    'name': 'COPILOT 2023',
+
+    'train_images': './data/copilot/images/train2023/',
+    'train_info': './data/copilot/annotations/instances_train2023.json',
+
+    'valid_images': './data/copilot/images/val2023/',
+    'valid_info':   './data/copilot/annotations/instances_val2023.json', 
+
+    'class_names': COPILOT_CLASSES,
+
+    'label_map': COPILOT_LABEL_MAP
 })
 
 coco2014_dataset = dataset_base.copy({
@@ -657,8 +673,8 @@ yolact_base_config = coco_base_config.copy({
     'name': 'yolact_base',
 
     # Dataset stuff
-    'dataset': coco2017_dataset,
-    'num_classes': len(coco2017_dataset.class_names) + 1,
+    'dataset': copilot_dataset,
+    'num_classes': len(copilot_dataset.class_names) + 1,
 
     # Image Size
     'max_size': 550,

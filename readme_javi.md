@@ -1,5 +1,7 @@
 ##Commands for train the model
 
+Meter el dataset del drive en la carpeta data/
+
 the dataset is in data/config.py copilot_dataset = ..... aqui tienes la referencia para las imagenes y etiquetas
 
 Lo del max_size tambien está en data/config.py en yolact_base_config tmb se puede cambiar de False a True el preserve_aspect_ratio para que no sea max_size x maz_size

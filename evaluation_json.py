@@ -245,7 +245,7 @@ def evalimage_cv2(net:Yolact, image:np.array):
 
 class EvaluationYOLACT():
 
-    def __init__(self, model_weight_path:str, top_k = 1000) -> None:
+    def __init__(self, model_weight_path:str, name_config:str, top_k = 1000) -> None:
         parse_args()
         
         args.top_k = top_k
@@ -253,7 +253,7 @@ class EvaluationYOLACT():
         args.score_threshold = 0.4
 
         print(args)
-        args.config = 'yolact_resnet50_config'
+        args.config = name_config
 
         if args.config is not None:
             set_cfg(args.config)
@@ -283,8 +283,14 @@ class EvaluationYOLACT():
         return all_boxes, all_segmentation, scores, classes
 
 
+#hyperparameters for evaluation
 path = '/home/cvar-admin/Documents/yolact/data/copilot_1024_1376/images/test2023/'
-yolact=EvaluationYOLACT('./weights/yolact_base_571_20000.pth')
+weights = './weights/yolact_base_54_80000.pth'
+name_config = 'yolact_base_config' #if resnet 101 use yolact_base_config elif resnet 50 use yolact_resnet50_config elif yolact plus use yolact_plus_base_config
+#---------------------------------------------
+
+
+yolact=EvaluationYOLACT(weights, name_config)
 final_json = []
 
 for filename in os.listdir(path):
